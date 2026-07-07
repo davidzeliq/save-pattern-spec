@@ -90,6 +90,11 @@
   .state-txt{font-size:11px;font-weight:600;margin-right:4px}
   .save-state[data-state="idle"]{display:none}
   .st-saving{color:var(--muted)} .st-saved{color:var(--ok)} .st-error{color:var(--err);cursor:pointer}
+  .input-wrap input.has-error{border-color:var(--err);box-shadow:0 0 0 3px var(--err-soft)}
+  .err-hint{display:none;align-items:center;gap:6px;color:var(--err);font-size:12px;margin-top:4px}
+  .err-hint.show{display:flex}
+  .retry-link{font:inherit;font-size:12px;font-weight:600;color:var(--err);background:none;border:none;text-decoration:underline;text-underline-offset:2px;cursor:pointer;padding:0}
+  .err-hint .pin-inline{color:var(--warn);background:var(--warn-soft);border:1px solid #f0dfb8;border-radius:5px;padding:0 5px;font-size:10px;font-weight:600;text-decoration:none}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid2 .field.full{grid-column:1/-1}
   textarea{width:100%;font:inherit;font-size:13.5px;color:var(--ink);resize:vertical;min-height:70px;background:#fff;border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:10px 12px}
@@ -209,10 +214,12 @@
             <div class="field">
               <div class="row-head"><label for="telA">Téléphone</label><div class="mini-actions"><span class="mini add">+ Ajouter</span><span class="mini enrich">Enrichir</span></div></div>
               <div class="input-wrap tel"><span class="flag">🇫🇷 ▾</span><input id="telA" class="autosave" data-label="Téléphone" type="text" value="+33 6 12 34 56 78" autocomplete="off"><span class="save-state" data-state="idle" aria-hidden="true"></span></div>
+              <div class="err-hint"><span>Échec de l'enregistrement ·</span><button class="retry-link" type="button">Réessayer</button><span class="pin-inline">retry à confirmer</span></div>
             </div>
             <div class="field">
               <div class="row-head"><label for="mailA">E-mail</label><div class="mini-actions"><span class="mini add">+ Ajouter</span><span class="mini enrich">Enrichir</span></div></div>
               <div class="input-wrap"><input id="mailA" class="autosave" data-label="E-mail" type="text" value="camille.durand@greentek.example" autocomplete="off"><span class="pro">Pro</span><span class="save-state" data-state="idle" aria-hidden="true"></span></div>
+              <div class="err-hint"><span>Échec de l'enregistrement ·</span><button class="retry-link" type="button">Réessayer</button><span class="pin-inline">retry à confirmer</span></div>
             </div>
             <label class="toggle-row"><input type="checkbox" id="failToggle" style="accent-color:var(--err)"> Simuler un échec réseau au prochain enregistrement</label>
             <div class="sr" aria-live="polite" id="liveA"></div>
@@ -268,7 +275,7 @@
           <div class="state-card"><div class="sc-label">idle</div><div class="sc-demo"><span class="val">+33 6 12 34 56 78</span><span class="val muted">—</span></div></div>
           <div class="state-card"><div class="sc-label">saisie → enregistrement</div><div class="sc-demo"><span class="val">+33 6 12 34 56 79</span><span class="mini-spinner"></span></div></div>
           <div class="state-card"><div class="sc-label">enregistré <span class="sc-tag new">DS new</span></div><div class="sc-demo"><span class="val">+33 6 12 34 56 79</span><span class="chk">✓</span></div></div>
-          <div class="state-card"><div class="sc-label">erreur</div><div class="sc-demo"><span class="val">+33 6 12 34 56 79</span><span class="xmk">✕ Réessayer</span></div></div>
+          <div class="state-card"><div class="sc-label">erreur <span class="sc-tag" style="background:var(--ok-soft);color:var(--ok)">DS existant</span></div><div class="sc-demo" style="border-color:var(--err);box-shadow:0 0 0 3px var(--err-soft)"><span class="val">+33 6 12 34 56 79</span></div><div style="color:var(--err);font-size:11px;margin-top:5px">Échec · <span style="text-decoration:underline">Réessayer</span></div></div>
         </div>
         <p style="margin-top:14px"><b>Barre de confirmation</b> :</p>
         <div class="state-gallery">
@@ -321,7 +328,9 @@
         <div class="tablescroll"><table class="spec">
           <thead><tr><th>Brique</th><th>DS Heroes</th><th>Statut</th></tr></thead>
           <tbody>
-            <tr><td>Champ de saisie</td><td>Input</td><td><b style="color:var(--draft)">À faire évoluer</b> — nouveau slot d'état à droite (<code>idle</code> / <code>saving</code> / <code>saved</code> / <code>error</code>). C'est le cœur du lot « autosave ».</td></tr>
+            <tr><td>Champ de saisie — indicateur succès</td><td>Input</td><td><b style="color:var(--draft)">Net-new</b> — indicateur d'état à droite : <code>saving</code> → <code>saved</code>. Absent des variants actuels (<code>default / hover / focus / entered / disabled</code> + <code>has-error</code>). C'est le cœur du lot « autosave ».</td></tr>
+            <tr><td>Champ de saisie — état d'erreur</td><td>Input <code>has-error</code></td><td><b style="color:var(--ok)">Existant</b> — contour rouge + message d'aide rouge sous le champ. À réutiliser (pas de nouvel état à créer).</td></tr>
+            <tr><td>Retry dans le message d'erreur</td><td>—</td><td><b style="color:var(--warn)">À confirmer</b> — pas d'action dans le message d'aide du DS aujourd'hui.</td></tr>
             <tr><td>Boutons barre</td><td>Button (primary / ghost)</td><td>Existant</td></tr>
             <tr><td>Barre de confirmation</td><td>—</td><td><b style="color:var(--draft)">Net-new</b> — conteneur sticky, à créer. Placement <span class="pin">à confirmer</span>.</td></tr>
             <tr><td>Modale sortie</td><td>Modal / Dialog</td><td>Existant</td></tr>
@@ -412,17 +421,20 @@
     slot.dataset.state=state;
     if(state==='saving'){slot.innerHTML='<span class="state-txt st-saving">Enregistrement…</span><span class="spinner"></span>';}
     else if(state==='saved'){slot.innerHTML='<span class="state-txt st-saved">Enregistré</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b8a52" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';liveA.textContent=label+' enregistré';}
-    else if(state==='error'){slot.innerHTML='<span class="state-txt st-error">Échec · <u>Réessayer</u></span>';liveA.textContent='Échec de l’enregistrement de '+label+'. Réessayez.';}
     else{slot.innerHTML='';}
   }
   document.querySelectorAll('input.autosave').forEach(function(inp){
-    var slot=inp.parentElement.querySelector('.save-state'),timer=null,hide=null,label=inp.dataset.label;
-    function attempt(){clearTimeout(hide);render(slot,'saving',label);timer=setTimeout(function(){
-      if(fail.checked){render(slot,'error',label);fail.checked=false;}
+    var field=inp.closest('.field'), slot=inp.parentElement.querySelector('.save-state');
+    var hint=field.querySelector('.err-hint'), retry=hint?hint.querySelector('.retry-link'):null;
+    var timer=null,hide=null,label=inp.dataset.label;
+    function clearErr(){inp.classList.remove('has-error');if(hint)hint.classList.remove('show');}
+    function showErr(){render(slot,'idle',label);inp.classList.add('has-error');if(hint)hint.classList.add('show');liveA.textContent='Échec de l’enregistrement de '+label+'. Réessayez.';}
+    function attempt(){clearTimeout(hide);clearErr();render(slot,'saving',label);timer=setTimeout(function(){
+      if(fail.checked){showErr();fail.checked=false;}
       else{render(slot,'saved',label);hide=setTimeout(function(){render(slot,'idle',label);},2200);}
     },850);}
     inp.addEventListener('input',function(){clearTimeout(timer);attempt();});
-    slot.addEventListener('click',function(){if(slot.dataset.state==='error'){attempt();}});
+    if(retry)retry.addEventListener('click',attempt);
   });
 
   /* confirmation bar */

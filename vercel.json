@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/", "destination": "https://zeliq-vision.vercel.app/save-pattern", "permanent": true },
+    { "source": "/:path*", "destination": "https://zeliq-vision.vercel.app/save-pattern", "permanent": true }
+  ]
+}

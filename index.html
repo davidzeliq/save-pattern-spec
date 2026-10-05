@@ -1285,6 +1285,8 @@ a { color: inherit; text-decoration: none; }
 /* Page chrome — every colour, radius and shadow comes from the DS variables above */
 *{box-sizing:border-box}
 html,body{margin:0}
+/* the DS base sets body{overflow:hidden} for the app shell; this page scrolls as a document */
+html{overflow-y:auto}body{overflow:visible}
 body{background:var(--backgroundDefault);color:var(--textDefault);font-family:var(--fontFamilyBase);font-size:13px;line-height:1.5;padding:24px 16px 64px}
 .wrap{max-width:1120px;margin:0 auto}
 h1,h2,h3{font-family:var(--fontFamilyHeading);font-weight:var(--fontWeightBold);margin:0}
